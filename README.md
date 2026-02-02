@@ -1,9 +1,9 @@
 ## Bathroom Pass System for CRLS
 Created by:
 - Mustafa Paktiawal
-- Hassan
-- Franco
-- Kai
+- Syed Hasan
+- Franco Mendoza
+- Kai Ademi
 
 ## Bathroom Pass Printer (High School)
 
