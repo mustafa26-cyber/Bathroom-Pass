@@ -5,41 +5,43 @@ Created by:
 - Franco
 - Kai
 
-## Description
+## Bathroom Pass Printer (High School)
 
-This is a simple Python program created for a school project. It is used to issue bathroom (hall) passes and keep a basic log of students who leave the classroom.
+A simple Python program that creates a digital bathroom hall pass using a graphical window.  
+Designed for beginners and classroom use.
 
+---
 
-The program runs in the terminal and records:
-- Student name
-- Date
-- Time
-- Reason for leaving
+## What this program does
+- Opens a friendly window where students can enter:
+  - Their name  
+  - Their reason for leaving  
+- Automatically adds:
+  - Current **date**
+  - Current **time**
+- Displays a nicely formatted hall pass on the screen  
+- Keeps a record of all passes in the program (in a list called `logs`).
 
-## Requirements:
-- Python 3.14.2 installed on the computer
-- No additional libraries are needed.
+---
 
-## How to Run the code:
-- Download or clone this repository from GitHub.
-- Open the folder containing the Python file.
-- Open a terminal or command prompt in that folder.
-- Run the program using: `python bathroom_pass.py`
+## Requirements (what you need)
+Make sure you have **Python installed** on your computer.
 
-## How to Use:
-- When the program starts, you will see this menu: Type 'p' for New - - Pass, 'l' for Log, or 'q' to quit:
+This program uses:
+- `tkinter` (comes with most Python installations)
+- `datetime` (built into Python)
 
-### p – New Pass:
-- Enter the student’s name
-- Enter the reason for leaving
-- The program prints a bathroom pass and saves the entry
+You do **not** need to install anything extra.
 
-### l – Log:
-- Displays a list of all issued passes for the session
+---
 
-### q – Quit:
-- Exits the program
+## How to run the program (super easy)
 
-### Notes:
-- All logs are stored temporarily and reset when the program closes
-- This project demonstrates basic Python skills such as functions, - lists, dictionaries, loops, and date/time usage
+1. Download the file from this repository.
+2. Make sure the file ends in `.py` (for example: `bathroom_pass.py`)
+3. Open your computer’s **terminal** or **VS Code**.
+4. Run this command:
+
+```bash
+python bathroom_pass.py
+
