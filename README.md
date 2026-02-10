@@ -12,7 +12,7 @@ Designed for beginners and classroom use.
 
 ---
 
-## What this program does
+### What this program does
 - Opens a friendly window where students can enter:
   - Their name  
   - Their reason for leaving  
