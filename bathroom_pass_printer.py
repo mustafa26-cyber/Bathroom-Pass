@@ -548,42 +548,56 @@ def show_other_reason_dropdown():
 def finalize_pass(reason):
 
 
-   now=datetime.datetime.now()
-   date=now.strftime("%m/%d/%Y")
-   time=now.strftime("%I:%M %p")
+    global selected_student
 
 
-   print_to_printer(selected_student,reason,date,time)
+    # Check if student already has an active pass
+    if selected_student in active_passes:
+        messagebox.showwarning(
+            "Active Pass",
+            f"{selected_student} already has an active pass.\nPlease press 'Done' before getting a new one."
+        )
+        return  # Do not print again
 
 
-   logs.append({
-       "Name":selected_student,
-       "Date":date,
-       "Time Out":time,
-       "Time In":"",
-       "Reason":reason
-   })
+    now = datetime.datetime.now()
+    date = now.strftime("%m/%d/%Y")
+    time = now.strftime("%I:%M %p")
 
 
-   active_passes[selected_student]=datetime.datetime.now()
+    print_to_printer(selected_student, reason, date, time)
 
 
-   save_logs()
+    logs.append({
+        "Name": selected_student,
+        "Date": date,
+        "Time Out": time,
+        "Time In": "",
+        "Reason": reason
+    })
 
 
-   clear_window()
+    active_passes[selected_student] = datetime.datetime.now()
 
 
-   tk.Label(
-       window,
-       text="Your pass is being printed,\nmake sure you get it signed!\nMake sure you sign back in",
-       font=("Segoe UI",28,"bold"),
-       bg=BG_COLOR,
-       fg="red"
-   ).pack(expand=True)
+    save_logs()
 
 
-   window.after(5000,period_screen)
+    clear_window()
+
+
+    tk.Label(
+        window,
+        text="Your pass is being printed,\nmake sure you get it signed!\nMake sure you sign back in",
+        font=("Segoe UI",28,"bold"),
+        bg=BG_COLOR,
+        fg="red"
+    ).pack(expand=True)
+
+
+    window.after(5000, period_screen)
+
+
 
 
 # ---------------- SIGN BACK IN ----------------
@@ -664,6 +678,8 @@ load_logs()
 period_screen()
 check_overdue_passes()
 window.mainloop()
+
+
 
 
 
