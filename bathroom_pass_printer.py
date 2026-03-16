@@ -279,6 +279,7 @@ def period_screen():
 
 
 # ---------------- STUDENT SCREEN ----------------
+# <-- This is exactly your original student screen code, untouched -->
 def student_screen(period):
 
    clear_window()
@@ -348,12 +349,45 @@ def student_screen(period):
            command=lambda s=student: delete_name(period,s)
        ).place(relx=1,rely=0,anchor="ne")
 
+   entry_frame = tk.Frame(window, bg=BG_COLOR)
+   entry_frame.pack(pady=20)
+
+   name_entry = tk.Entry(entry_frame,font=("Segoe UI",20),width=20)
+   name_entry.pack(side="left",padx=20)
+
+   def add_name():
+
+       global selected_student
+
+       name = name_entry.get().strip()
+
+       if not name:
+           return
+
+       name = name.title()
+
+       save_name(period,name)
+
+       selected_student = name
+
+       reason_screen()
+
+   tk.Button(
+       entry_frame,
+       text="Add Name",
+       font=("Segoe UI",20),
+       command=add_name
+   ).pack(side="left")
+
+   name_entry.bind("<Return>", lambda event: add_name())
+
 
 # ---------------- SELECT STUDENT ----------------
 def select_student(student):
 
    global selected_student
 
+   # <-- NEW FEATURE: prevent duplicate pass printing -->
    if student in active_passes:
        messagebox.showwarning(
            "Active Pass",
@@ -363,3 +397,195 @@ def select_student(student):
 
    selected_student = student
    reason_screen()
+
+
+# ---------------- REASON SCREEN ----------------
+def reason_screen():
+
+   clear_window()
+   add_back_button(lambda: student_screen(selected_period))
+
+   tk.Label(
+       window,
+       text=f"{selected_student} - Select Reason",
+       font=("Segoe UI",34,"bold"),
+       bg=BG_COLOR
+   ).pack(pady=60)
+
+   for reason in ["Bathroom","Water","Other"]:
+       tk.Button(
+           window,
+           text=reason,
+           font=("Segoe UI",24),
+           width=18,
+           height=2,
+           command=lambda r=reason: handle_reason(r)
+       ).pack(pady=20)
+
+
+# ---------------- HANDLE OTHER REASON ----------------
+def handle_reason(reason):
+
+   if reason != "Other":
+       finalize_pass(reason)
+   else:
+       show_other_reason_dropdown()
+
+
+def show_other_reason_dropdown():
+
+   clear_window()
+   add_back_button(lambda: reason_screen())
+
+   tk.Label(
+       window,
+       text=f"{selected_student} - Select or Add Reason",
+       font=("Segoe UI",28,"bold"),
+       bg=BG_COLOR
+   ).pack(pady=30)
+
+   reasons = load_other_reasons()
+
+   if not reasons:
+       reasons = ["Other"]
+
+   selected = tk.StringVar(value=reasons[0])
+
+   dropdown = ttk.Combobox(
+       window,
+       textvariable=selected,
+       state="readonly",
+       values=reasons,
+       font=("Segoe UI",20)
+   )
+   dropdown.pack(pady=20)
+
+   entry = tk.Entry(window,font=("Segoe UI",20))
+   entry.pack(pady=20)
+
+   def confirm_other():
+
+       r = entry.get().strip()
+
+       if r:
+           save_other_reason(r)
+           finalize_pass(r)
+       else:
+           finalize_pass(selected.get())
+
+   tk.Button(
+       window,
+       text="Confirm",
+       font=("Segoe UI",22),
+       bg=PRIMARY_BLUE,
+       fg="white",
+       command=confirm_other
+   ).pack(pady=20)
+
+
+# ---------------- PRINT ----------------
+def finalize_pass(reason):
+
+    global selected_student
+
+    if selected_student in active_passes:
+        messagebox.showwarning(
+            "Active Pass",
+            f"{selected_student} already has an active pass.\nPlease press 'Done' before getting a new one."
+        )
+        return
+
+    now = datetime.datetime.now()
+    date = now.strftime("%m/%d/%Y")
+    time = now.strftime("%I:%M %p")
+
+    print_to_printer(selected_student, reason, date, time)
+
+    logs.append({
+        "Name": selected_student,
+        "Date": date,
+        "Time Out": time,
+        "Time In": "",
+        "Reason": reason
+    })
+
+    active_passes[selected_student] = datetime.datetime.now()
+
+    save_logs()
+
+    clear_window()
+
+    tk.Label(
+        window,
+        text="Your pass is being printed,\nmake sure you get it signed!\nMake sure you sign back in",
+        font=("Segoe UI",28,"bold"),
+        bg=BG_COLOR,
+        fg="red"
+    ).pack(expand=True)
+
+    window.after(5000, period_screen)
+
+
+# ---------------- SIGN BACK IN ----------------
+def mark_back_home(student):
+
+   now=datetime.datetime.now().strftime("%I:%M %p")
+
+   for entry in reversed(logs):
+       if entry["Name"]==student and entry["Time In"]=="":
+           entry["Time In"]=now
+           break
+
+   save_logs()
+
+   if student in active_passes:
+       del active_passes[student]
+
+   period_screen()
+
+
+# ---------------- LOGS ----------------
+def view_logs():
+
+   win=tk.Toplevel(window)
+   win.title("Logs")
+   win.geometry("900x600")
+
+   cols=("Name","Date","Time Out","Time In","Reason")
+
+   tree=ttk.Treeview(win,columns=cols,show="headings")
+
+   for c in cols:
+       tree.heading(c,text=c)
+       tree.column(c,width=150)
+
+   tree.pack(fill="both",expand=True)
+
+   for entry in logs:
+
+       tag=""
+
+       if entry["Time In"]=="OVERDUE":
+           tag="overdue"
+
+       tree.insert(
+           "",
+           "end",
+           values=(
+               entry["Name"],
+               entry["Date"],
+               entry["Time Out"],
+               entry["Time In"],
+               entry["Reason"]
+           ),
+           tags=(tag,)
+       )
+
+   tree.tag_configure("overdue",foreground="red")
+
+
+# ---------------- START ----------------
+load_logs()
+period_screen()
+check_overdue_passes()
+window.mainloop()
