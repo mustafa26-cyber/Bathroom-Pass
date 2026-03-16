@@ -510,14 +510,15 @@ def show_other_reason_dropdown():
        textvariable=selected,
        state="readonly",
        values=reasons,
-       font=("Segoe UI",20)
+       font=("Segoe UI",20),
+       width=35
    )
 
 
    dropdown.pack(pady=20)
 
 
-   entry = tk.Entry(window,font=("Segoe UI",20))
+   entry = tk.Entry(window,font=("Segoe UI",20), width=35)
    entry.pack(pady=20)
 
 
@@ -551,13 +552,12 @@ def finalize_pass(reason):
     global selected_student
 
 
-    # Check if student already has an active pass
     if selected_student in active_passes:
         messagebox.showwarning(
             "Active Pass",
             f"{selected_student} already has an active pass.\nPlease press 'Done' before getting a new one."
         )
-        return  # Do not print again
+        return
 
 
     now = datetime.datetime.now()
@@ -596,8 +596,6 @@ def finalize_pass(reason):
 
 
     window.after(5000, period_screen)
-
-
 
 
 # ---------------- SIGN BACK IN ----------------
@@ -678,10 +676,3 @@ load_logs()
 period_screen()
 check_overdue_passes()
 window.mainloop()
-
-
-
-
-
-
-
