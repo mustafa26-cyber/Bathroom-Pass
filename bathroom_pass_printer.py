@@ -277,9 +277,17 @@ def period_screen():
    )
    view_log_button.pack(side="bottom", pady=20)
 
+   # ----------- ADDED TEXT (bottom-left corner) -----------
+   tk.Label(
+       window,
+       text="Created by Franco Mendoza, Syed Hasan, Mustafa Paktiawal, and Kai Ademi",
+       font=("Segoe UI",10),
+       bg=BG_COLOR,
+       anchor="w"
+   ).place(x=10, y=window.winfo_screenheight() - 30)
+
 
 # ---------------- STUDENT SCREEN ----------------
-# <-- This is exactly your original student screen code, untouched -->
 def student_screen(period):
 
    clear_window()
@@ -387,7 +395,6 @@ def select_student(student):
 
    global selected_student
 
-   # <-- NEW FEATURE: prevent duplicate pass printing -->
    if student in active_passes:
        messagebox.showwarning(
            "Active Pass",
