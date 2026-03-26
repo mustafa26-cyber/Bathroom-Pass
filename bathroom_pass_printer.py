@@ -18,6 +18,7 @@ NAMES_FILE = "names.json"
 LOG_FILE = "logs.json"
 OTHER_REASONS_FILE = "other_reasons.json"
 ANALYTICS_FILE = "analytics.json"
+ANALYTICS_PASSWORD = "Ilovethisclass123$"
 
 window = tk.Tk()
 window.title("Bathroom Pass System")
@@ -95,10 +96,13 @@ def calculate_time_diff(start_str, end_str):
     try:
         t1 = datetime.datetime.strptime(start_str, "%I:%M %p")
         t2 = datetime.datetime.strptime(end_str, "%I:%M %p")
-        diff = (t2 - t1).total_seconds() / 60
+
+        diff = (t2 - t1).total_seconds()
+
         if diff < 0:
-            diff += 24 * 60
-        return round(diff, 2)
+            diff += 24 * 60 * 60
+
+        return int(diff)  # return seconds
     except:
         return None
 
@@ -126,6 +130,11 @@ def update_analytics(entry):
         "median": median_val
     }
     save_analytics(data)
+
+def format_seconds(seconds):
+        minutes = seconds // 60
+        secs = seconds % 60
+        return f"{minutes}:{secs:02}"
 
 # ---------------- PRINTER ----------------
 def send_zpl(zpl):
@@ -370,6 +379,8 @@ def student_screen(period):
 
     max_rows = 6
 
+    # if name in ['shit', 'fuck', 'damn',]
+    #     print("Name not allowed")
     for i, student in enumerate(student_names):
         row = i % max_rows
         column = i // max_rows
@@ -564,23 +575,40 @@ def mark_back_home(student):
 
 # ---------------- LOGS ----------------
 def view_logs():
-    win=tk.Toplevel(window)
+    win = tk.Toplevel(window)
     win.title("Logs")
     win.geometry("900x600")
+    win.configure(bg="#2c2f33")  # darker background
 
-    cols=("Name","Date","Time Out","Time In","Reason")
-    tree=ttk.Treeview(win,columns=cols,show="headings")
+    cols = ("Name", "Date", "Time Out", "Time In", "Reason")
+
+    tree = ttk.Treeview(win, columns=cols, show="headings")
+
+    style = ttk.Style()
+    style.theme_use("default")
+
+    # Dark theme styling
+    style.configure("Treeview",
+                    background="#23272a",
+                    foreground="white",
+                    rowheight=25,
+                    fieldbackground="#23272a")
+
+    style.configure("Treeview.Heading",
+                    background="#2c2f33",
+                    foreground="white")
 
     for c in cols:
-        tree.heading(c,text=c)
-        tree.column(c,width=150)
+        tree.heading(c, text=c)
+        tree.column(c, width=150)
 
-    tree.pack(fill="both",expand=True)
+    tree.pack(fill="both", expand=True)
 
     for entry in logs:
-        tag=""
-        if entry["Time In"]=="OVERDUE":
-            tag="overdue"
+        tag = ""
+        if entry["Time In"] == "OVERDUE":
+            tag = "overdue"
+
         tree.insert(
             "",
             "end",
@@ -593,35 +621,88 @@ def view_logs():
             ),
             tags=(tag,)
         )
-    tree.tag_configure("overdue",foreground="red")
+
+    tree.tag_configure("overdue", foreground="red")
 
 # ---------------- ANALYTICS VIEW ----------------
+
 def view_analytics():
-    analytics = load_analytics()
+    # password code here...
+    ...
 
-    win = tk.Toplevel(window)
-    win.title("Analytics")
-    win.geometry("900x600")
 
-    cols = ("Name", "Mean Time (min)", "Median Time (min)", "All Durations (min)")
-    tree = ttk.Treeview(win, columns=cols, show="headings")
+def open_analytics_window():
+    # full analytics window code here...
+    ...
+    password_window = tk.Toplevel(window)
+    password_window.title("Enter Password")
+    password_window.geometry("300x150")
+    password_window.configure(bg="#2c2f33")
 
-    for c in cols:
-        tree.heading(c, text=c)
-        tree.column(c, width=200 if c != "All Durations (min)" else 300)
+    tk.Label(
+        password_window,
+        text="Enter Password:",
+        font=("Segoe UI", 14),
+        bg="#2c2f33",
+        fg="white"
+    ).pack(pady=10)
 
-    tree.pack(fill="both", expand=True)
+    password_entry = tk.Entry(password_window, show="*", font=("Segoe UI", 14))
+    password_entry.pack(pady=5)
 
-    for name, data in analytics.items():
-        durations = data.get("durations", [])
-        mean_val = data.get("mean", 0)
-        median_val = data.get("median", 0)
-        durations_str = ", ".join(str(d) for d in durations)
-        tree.insert(
-                    "",
-        "end",
-        values=(name, mean_val, median_val, durations_str)
-    )
+def open_analytics_window():
+        analytics = load_analytics()
+
+        win = tk.Toplevel(window)
+        win.title("Analytics")
+        win.geometry("900x600")
+        win.configure(bg="#2c2f33")  # darker background
+
+        cols = ("Name", "Mean Time (min)", "Median Time (min)", "All Durations (min)")
+
+        tree = ttk.Treeview(win, columns=cols, show="headings")
+
+        style = ttk.Style()
+        style.theme_use("default")
+
+        # Dark theme styling
+        style.configure("Treeview",
+                        background="#23272a",
+                        foreground="white",
+                        rowheight=25,
+                        fieldbackground="#23272a")
+
+        style.configure("Treeview.Heading",
+                        background="#2c2f33",
+                        foreground="white")
+
+        for c in cols:
+            tree.heading(c, text=c)
+            tree.column(c, width=200 if c != "All Durations (min)" else 300)
+
+        tree.pack(fill="both", expand=True)
+
+        for name, data in analytics.items():
+            durations = data.get("durations", [])
+            mean_val = data.get("mean", 0)
+            median_val = data.get("median", 0)
+            durations_str = ", ".join(str(d) for d in durations)
+
+            tree.insert("", "end", values=(name, mean_val, median_val, durations_str))
+
+def check_password():
+    if password_entry.get() == ANALYTICS_PASSWORD:
+            password_window.destroy()
+            open_analytics_window()
+    else:
+            messagebox.showerror("Error", "Incorrect Password")
+
+    tk.Button(
+        password_window,
+        text="Submit",
+        font=("Segoe UI", 12),
+        command=check_password
+    ).pack(pady=10)
 
 # ---------------- START ----------------
 load_logs()
