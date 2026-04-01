@@ -482,6 +482,9 @@ def student_screen(period):
        name = name_entry.get().strip()
        if not name:
            return
+       if len(name) > 20:
+           messagebox.showwarning("Name Too Long", "Name must be 20 characters or fewer.")
+           return
        name = name.title()
        save_name(period,name)
        selected_student = name
