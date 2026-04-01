@@ -375,7 +375,7 @@ def period_screen():
    # 🔒 Hidden clickable name
    franco_label = tk.Label(
        credit_frame,
-       text="Franco Mendoza",
+       text="Franco",
        font=("Segoe UI", 16, "bold"),
        bg=BG_COLOR,
        fg="black",
@@ -386,7 +386,7 @@ def period_screen():
    #  text (after Franco)
    tk.Label(
        credit_frame,
-       text=", Syed Hasan, Mustafa Paktiawal, and Kai Ademi",
+       text="Mendoza, Syed Hasan, Mustafa Paktiawal, and Kai Ademi",
        font=("Segoe UI", 16, "bold"),
        bg=BG_COLOR
    ).pack(side="left")
