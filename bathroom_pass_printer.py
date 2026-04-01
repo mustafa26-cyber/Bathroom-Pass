@@ -363,6 +363,19 @@ def period_screen():
    secret_frame = tk.Frame(window, bg=BG_COLOR)
    secret_frame.place(x=10, y=window.winfo_screenheight() - 50)
 
+   # Secret button FIRST (so it's behind)
+   secret_button = tk.Button(
+       secret_frame,
+       text="",
+       command=view_analytics,
+       bg=BG_COLOR,
+       activebackground="#d0d0d0",
+       bd=0,
+       highlightthickness=0
+   )
+   secret_button.pack(fill="both", expand=True)
+
+   # Label on top (so text is visible)
    credit_label = tk.Label(
        secret_frame,
        text="Created by Franco Mendoza, Syed Hasan, Mustafa Paktiawal, and Kai Ademi",
@@ -371,7 +384,7 @@ def period_screen():
        fg="black",
        anchor="w"
    )
-   credit_label.pack()
+   credit_label.place(relx=0, rely=0)
 
    # Secret invisible button (same area)
    secret_button = tk.Button(
