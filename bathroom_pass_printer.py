@@ -358,47 +358,29 @@ def period_screen():
    view_log_button.pack(side="bottom", pady=20)
 
 
+   # View Analytics button
+   view_analytics_button = tk.Button(
+       right_frame,
+       text="View Analytics",
+       font=("Segoe UI",22),
+       bg="#4B0082",
+       fg="white",
+       padx=30,
+       pady=10,
+       bd=0,
+       command=view_analytics
+   )
+   view_analytics_button.pack(side="bottom", pady=10)
+
 
    # Credit text
-   secret_frame = tk.Frame(window, bg=BG_COLOR)
-   secret_frame.place(x=10, y=window.winfo_screenheight() - 50)
-
-   # Secret button FIRST (so it's behind)
-   secret_button = tk.Button(
-       secret_frame,
-       text="",
-       command=view_analytics,
-       bg=BG_COLOR,
-       activebackground="#d0d0d0",
-       bd=0,
-       highlightthickness=0
-   )
-   secret_button.pack(fill="both", expand=True)
-
-   # Label on top (so text is visible)
-   credit_label = tk.Label(
-       secret_frame,
+   tk.Label(
+       window,
        text="Created by Franco Mendoza, Syed Hasan, Mustafa Paktiawal, and Kai Ademi",
-       font=("Segoe UI", 16, "bold"),
+       font=("Segoe UI",16,"bold"),
        bg=BG_COLOR,
-       fg="black",
        anchor="w"
-   )
-   credit_label.place(relx=0, rely=0)
-
-   # Secret invisible button (same area)
-   secret_button = tk.Button(
-       secret_frame,
-       text="",
-       command=view_analytics,
-       bg=BG_COLOR,
-       activebackground="#d0d0d0",  # 👈 shows when hovered
-       bd=0,
-       highlightthickness=0,
-       width=80,  # covers the whole text area
-       height=2
-   )
-   secret_button.place(relx=0, rely=0, relwidth=1, relheight=1)
+   ).place(x=10, y=window.winfo_screenheight() - 40)
 
 
 # ---------------- STUDENT SCREEN ----------------
