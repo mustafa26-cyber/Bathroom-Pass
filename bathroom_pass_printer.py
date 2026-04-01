@@ -358,29 +358,41 @@ def period_screen():
    view_log_button.pack(side="bottom", pady=20)
 
 
-   # View Analytics button
-   view_analytics_button = tk.Button(
-       right_frame,
-       text="View Analytics",
-       font=("Segoe UI",22),
-       bg="#4B0082",
-       fg="white",
-       padx=30,
-       pady=10,
-       bd=0,
-       command=view_analytics
-   )
-   view_analytics_button.pack(side="bottom", pady=10)
 
 
    # Credit text
+   credit_frame = tk.Frame(window, bg=BG_COLOR)
+   credit_frame.place(x=10, y=window.winfo_screenheight() - 40)
+
+   # Normal text (before Franco)
    tk.Label(
-       window,
-       text="Created by Franco Mendoza, Syed Hasan, Mustafa Paktiawal, and Kai Ademi",
-       font=("Segoe UI",16,"bold"),
+       credit_frame,
+       text="Created by ",
+       font=("Segoe UI", 16, "bold"),
+       bg=BG_COLOR
+   ).pack(side="left")
+
+   # 🔒 Hidden clickable name
+   franco_label = tk.Label(
+       credit_frame,
+       text="Franco Mendoza",
+       font=("Segoe UI", 16, "bold"),
        bg=BG_COLOR,
-       anchor="w"
-   ).place(x=10, y=window.winfo_screenheight() - 40)
+       fg="black",
+       cursor="hand2"  # optional: remove this line if you want ZERO hint
+   )
+   franco_label.pack(side="left")
+
+   #  text (after Franco)
+   tk.Label(
+       credit_frame,
+       text=", Syed Hasan, Mustafa Paktiawal, and Kai Ademi",
+       font=("Segoe UI", 16, "bold"),
+       bg=BG_COLOR
+   ).pack(side="left")
+
+   # Click triggers analytics
+   franco_label.bind("<Button-1>", lambda e: view_analytics())
 
 
 # ---------------- STUDENT SCREEN ----------------
