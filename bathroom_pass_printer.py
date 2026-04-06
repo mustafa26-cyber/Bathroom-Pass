@@ -707,7 +707,43 @@ def mark_back_home(student):
    for entry in reversed(logs):
        if entry["Name"]==student and entry["Time In"]=="":
            entry["Time In"]=now
-           update_analytics(entry)  # Update analytics here
+
+           def update_analytics(entry):
+               if entry["Time In"] == "" or entry["Time In"] == "OVERDUE":
+                   return
+
+               duration = calculate_time_diff(entry["Time Out"], entry["Time In"])
+               if duration is None:
+                   return
+
+               data = load_analytics()
+               name = entry["Name"]
+               reason = entry.get("Reason", "Unknown")
+
+               data.setdefault(name, {
+                   "durations": [],
+                   "reasons": {}
+               })
+
+               # --- durations ---
+               durations = data[name].get("durations", [])
+               durations.append(duration)
+
+               # --- reasons ---
+               reasons = data[name].get("reasons", {})
+               reasons[reason] = reasons.get(reason, 0) + 1
+
+               mean_val = round(statistics.mean(durations), 2)
+               median_val = round(statistics.median(durations), 2)
+
+               data[name] = {
+                   "durations": durations,
+                   "mean": mean_val,
+                   "median": median_val,
+                   "reasons": reasons
+               }
+
+               save_analytics(data)  # Update analytics here
            break
 
 
@@ -825,141 +861,171 @@ def view_analytics():
 
 
 def open_analytics_window():
-   analytics = load_analytics()
+    analytics = load_analytics()
 
+    win = tk.Toplevel(window)
+    win.title("Analytics")
+    win.geometry("1000x650")
+    win.configure(bg="#2c2f33")
 
-   win = tk.Toplevel(window)
-   win.title("Analytics")
-   win.geometry("900x600")
-   win.configure(bg="#2c2f33")
+    notebook = ttk.Notebook(win)
+    notebook.pack(fill="both", expand=True)
 
+    # ---------------- TAB 1: TIME ANALYTICS ----------------
+    tab1 = tk.Frame(notebook, bg="#2c2f33")
+    notebook.add(tab1, text="Time Analytics")
 
-   cols = ("Name", "Mean (min)", "Median (min)", "Durations (min)")
+    cols1 = ("Name", "Mean Time (min)", "Median Time (min)", "All Durations (min)")
+    tree1 = ttk.Treeview(tab1, columns=cols1, show="headings")
 
+    for c in cols1:
+        tree1.heading(c, text=c)
+        tree1.column(c, width=200 if c != "All Durations (min)" else 300)
 
-   tree = ttk.Treeview(win, columns=cols, show="headings")
+    tree1.pack(fill="both", expand=True)
 
+    for name, data in analytics.items():
+        durations = data.get("durations", [])
+        mean_val = data.get("mean", 0)
+        median_val = data.get("median", 0)
+        durations_str = ", ".join(str(round(d/60,2)) for d in durations)
 
-   style = ttk.Style()
-   style.theme_use("default")
+        tree1.insert("", "end", values=(name, mean_val, median_val, durations_str))
 
+    # ---------------- TAB 2: REASON ANALYTICS ----------------
+    tab2 = tk.Frame(notebook, bg="#2c2f33")
+    notebook.add(tab2, text="Reason Analytics")
 
-   style.configure("Treeview",
-                   background="#23272a",
-                   foreground="white",
-                   rowheight=25,
-                   fieldbackground="#23272a")
+    cols2 = ("Reason", "Total Uses", "Top Student")
+    tree2 = ttk.Treeview(tab2, columns=cols2, show="headings")
 
+    for c in cols2:
+        tree2.heading(c, text=c)
+        tree2.column(c, width=250)
 
-   style.configure("Treeview.Heading",
-                   background="#2c2f33",
-                   foreground="white")
+    tree2.pack(fill="both", expand=True)
 
+    # --- aggregate reasons ---
+    reason_totals = {}
+    reason_users = {}
 
-   for c in cols:
-       tree.heading(c, text=c)
-       tree.column(c, width=200 if c != "Durations (min)" else 300)
+    for name, data in analytics.items():
+        reasons = data.get("reasons", {})
 
+        for reason, count in reasons.items():
+            reason_totals[reason] = reason_totals.get(reason, 0) + count
 
-   tree.pack(fill="both", expand=True)
+            if reason not in reason_users:
+                reason_users[reason] = {}
 
+            reason_users[reason][name] = count
 
-   all_durations = []
+    # --- populate table ---
+    for reason, total in reason_totals.items():
+        users = reason_users.get(reason, {})
 
+        # find top student
+        top_student = max(users, key=users.get) if users else "N/A"
 
-   for name, data in analytics.items():
-       durations_sec = data.get("durations", [])
-
-
-       # convert to minutes
-       durations_min = [round(d / 60, 2) for d in durations_sec]
-
-
-       mean_val = round(statistics.mean(durations_min), 2) if durations_min else 0
-       median_val = round(statistics.median(durations_min), 2) if durations_min else 0
-
-
-       durations_str = ", ".join(str(d) for d in durations_min)
-
-
-       tree.insert("", "end", values=(name, mean_val, median_val, durations_str))
-
-
-       all_durations.extend(durations_min)
-
-
-   # CLASS AVERAGE
-   if all_durations:
-       class_avg = round(statistics.mean(all_durations), 2)
-       tree.insert("", "end", values=("CLASS AVERAGE", class_avg, "-", "-"))
+        tree2.insert("", "end", values=(reason, total, top_student))
 
 
 def open_analytics_window():
-       analytics = load_analytics()
+    analytics = load_analytics()
 
+    win = tk.Toplevel(window)
+    win.title("Analytics")
+    win.geometry("1000x650")
+    win.configure(bg="#2c2f33")
 
-       win = tk.Toplevel(window)
-       win.title("Analytics")
-       win.geometry("900x600")
-       win.configure(bg="#2c2f33")  # darker background
+    # -------- TOP BUTTON BAR --------
+    button_frame = tk.Frame(win, bg="#2c2f33")
+    button_frame.pack(fill="x")
 
+    content_frame = tk.Frame(win, bg="#2c2f33")
+    content_frame.pack(fill="both", expand=True)
 
-       cols = ("Name", "Mean Time (min)", "Median Time (min)", "All Durations (min)")
+    # helper to clear content
+    def clear_content():
+        for widget in content_frame.winfo_children():
+            widget.destroy()
 
+    # -------- TIME ANALYTICS VIEW --------
+    def show_time_analytics():
+        clear_content()
 
-       tree = ttk.Treeview(win, columns=cols, show="headings")
+        cols = ("Name", "Mean Time (min)", "Median Time (min)", "All Durations (min)")
+        tree = ttk.Treeview(content_frame, columns=cols, show="headings")
 
+        for c in cols:
+            tree.heading(c, text=c)
+            tree.column(c, width=200 if c != "All Durations (min)" else 300)
 
-       style = ttk.Style()
-       style.theme_use("default")
+        tree.pack(fill="both", expand=True)
 
+        for name, data in analytics.items():
+            durations = data.get("durations", [])
+            mean_val = data.get("mean", 0)
+            median_val = data.get("median", 0)
 
-       # Dark theme styling
-       style.configure("Treeview",
-                       background="#23272a",
-                       foreground="white",
-                       rowheight=25,
-                       fieldbackground="#23272a")
+            durations_str = ", ".join(str(round(d/60, 2)) for d in durations)
 
+            tree.insert("", "end", values=(name, mean_val, median_val, durations_str))
 
-       style.configure("Treeview.Heading",
-                       background="#2c2f33",
-                       foreground="white")
+    # -------- REASON ANALYTICS VIEW --------
+    def show_reason_analytics():
+        clear_content()
 
+        cols = ("Reason", "Total Uses", "Top Student")
+        tree = ttk.Treeview(content_frame, columns=cols, show="headings")
 
-       for c in cols:
-           tree.heading(c, text=c)
-           tree.column(c, width=200 if c != "All Durations (min)" else 300)
+        for c in cols:
+            tree.heading(c, text=c)
+            tree.column(c, width=250)
 
+        tree.pack(fill="both", expand=True)
 
-       tree.pack(fill="both", expand=True)
+        reason_totals = {}
+        reason_users = {}
 
+        for name, data in analytics.items():
+            reasons = data.get("reasons", {})
 
-       for name, data in analytics.items():
-           durations = data.get("durations", [])
-           mean_val = data.get("mean", 0)
-           median_val = data.get("median", 0)
-           durations_str = ", ".join(str(d) for d in durations)
+            for reason, count in reasons.items():
+                reason_totals[reason] = reason_totals.get(reason, 0) + count
 
+                if reason not in reason_users:
+                    reason_users[reason] = {}
 
-           tree.insert("", "end", values=(name, mean_val, median_val, durations_str))
+                reason_users[reason][name] = count
 
+        for reason, total in reason_totals.items():
+            users = reason_users.get(reason, {})
+            top_student = max(users, key=users.get) if users else "N/A"
 
-def check_password():
-   if password_entry.get() == ANALYTICS_PASSWORD:
-           password_window.destroy()
-           open_analytics_window()
-   else:
-           messagebox.showerror("Error", "Incorrect Password")
+            tree.insert("", "end", values=(reason, total, top_student))
 
+    # -------- BUTTONS --------
+    tk.Button(
+        button_frame,
+        text="Time Analytics",
+        font=("Segoe UI", 14),
+        bg="#1f4ed8",
+        fg="white",
+        command=show_time_analytics
+    ).pack(side="left", padx=10, pady=10)
 
-   tk.Button(
-       password_window,
-       text="Submit",
-       font=("Segoe UI", 12),
-       command=check_password
-   ).pack(pady=10)
+    tk.Button(
+        button_frame,
+        text="Reason Analytics",
+        font=("Segoe UI", 14),
+        bg="#16a34a",
+        fg="white",
+        command=show_reason_analytics
+    ).pack(side="left", padx=10, pady=10)
 
+    # default view
+    show_time_analytics()
 
 # ---------------- START ----------------
 load_logs()
