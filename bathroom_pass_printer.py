@@ -930,6 +930,7 @@ def open_analytics_window():
         tree2.insert("", "end", values=(reason, total, top_student))
 
 
+
 def open_analytics_window():
     analytics = load_analytics()
 
@@ -949,6 +950,32 @@ def open_analytics_window():
     def clear_content():
         for widget in content_frame.winfo_children():
             widget.destroy()
+
+    def show_usage_counts():
+        clear_content()
+
+        cols = ("Name", "Total Passes")
+        tree = ttk.Treeview(content_frame, columns=cols, show="headings")
+
+        for c in cols:
+            tree.heading(c, text=c)
+            tree.column(c, width=300)
+
+        tree.pack(fill="both", expand=True)
+
+        # Count usage
+        counts = {}
+
+        for entry in logs:
+            name = entry["Name"]
+            counts[name] = counts.get(name, 0) + 1
+
+        # Sort most → least
+        sorted_counts = sorted(counts.items(), key=lambda x: x[1], reverse=True)
+
+        # Insert into table
+        for name, count in sorted_counts:
+            tree.insert("", "end", values=(name, count))
 
     # -------- TIME ANALYTICS VIEW --------
     def show_time_analytics():
@@ -1005,6 +1032,32 @@ def open_analytics_window():
 
             tree.insert("", "end", values=(reason, total, top_student))
 
+            def show_usage_counts():
+                clear_content()
+
+                cols = ("Name", "Total Passes")
+                tree = ttk.Treeview(content_frame, columns=cols, show="headings")
+
+                for c in cols:
+                    tree.heading(c, text=c)
+                    tree.column(c, width=300)
+
+                tree.pack(fill="both", expand=True)
+
+                # Count usage
+                counts = {}
+
+                for entry in logs:
+                    name = entry["Name"]
+                    counts[name] = counts.get(name, 0) + 1
+
+                # Sort most → least
+                sorted_counts = sorted(counts.items(), key=lambda x: x[1], reverse=True)
+
+                # Insert into table
+                for name, count in sorted_counts:
+                    tree.insert("", "end", values=(name, count))
+
     # -------- BUTTONS --------
     tk.Button(
         button_frame,
@@ -1024,8 +1077,16 @@ def open_analytics_window():
         command=show_reason_analytics
     ).pack(side="left", padx=10, pady=10)
 
+    tk.Button(
+        button_frame,
+        text="Usage Count",
+        font=("Segoe UI", 14),
+        bg="#0ea5e9",
+        fg="white",
+        command=show_usage_counts
+    ).pack(side="left", padx=10, pady=10)
+
     # default view
-    show_time_analytics()
 
 # ---------------- START ----------------
 load_logs()
