@@ -1,47 +1,94 @@
-## Bathroom Pass System for CRLS
+Bathroom Pass System for CRLS
+
 Created by:
-- Mustafa Paktiawal
-- Syed Hasan
-- Franco Mendoza
-- Kai Ademi
 
-## Bathroom Pass Printer (High School)
+Mustafa Paktiawal
+Syed Hasan
+Franco Mendoza
+Kai Ademi
+Bathroom Pass Printer (High School)
 
-A simple Python program that creates a digital bathroom hall pass using a graphical window.  
-Designed for beginners and classroom use.
+A Python-based bathroom pass system with a full-screen graphical interface designed for classroom use.
+It allows teachers and students to quickly generate, track, and analyze bathroom passes.
 
----
+What this program does
+Select a class period
+Choose or add a student name
+Select a reason for leaving
+Automatically records:
+Date
+Time Out
+Time In
+Prints a physical hall pass (Zebra printer supported)
+Tracks:
+Active students out of class
+Pass history (logs)
+Includes analytics dashboard (password protected):
+Average time out
+Median time
+Most-used reasons
+Student usage counts
 
-### What this program does
-- Opens a friendly window where students can enter:
-  - Their name  
-  - Their reason for leaving  
-- Automatically adds:
-  - Current **date**
-  - Current **time**
-- Displays a nicely formatted hall pass on the screen  
-- Keeps a record of all passes in the program (in a list called `logs`).
+Requirements (What you need)
+1. Install Python
 
----
+Make sure Python 3.9+ is installed.
 
-## Requirements (what you need)
-Make sure you have **Python installed** on your computer.
+2. Required Python Libraries
 
-This program uses:
-- `tkinter` (comes with most Python installations)
-- `datetime` (built into Python)
+All required libraries are built into Python:
 
-You do **not** need to install anything extra.
+tkinter (GUI)
+datetime
+json
+os
+subprocess
+tempfile
+statistics
 
----
+⚠️ SideNote:
 
-## How to run the program (super easy)
+On Windows/macOS, tkinter usually comes preinstalled
+On Linux, you may need to install it manually:
 
-1. Download the file from this repository.
-2. Make sure the file ends in `.py` (for example: `bathroom_pass.py`)
-3. Open your computer’s **terminal** or **VS Code**.
-4. Run this command:
+This program is designed for a Zebra printer using ZPL (Zebra Programming Language).
 
-```bash
-python bathroom_pass.py
+You Must:
+Make sure your printer is installed on your system
+Ensure the printer name matches EXACTLY
+On Mac/Linux: lpstat -p
+On Windows: PRINTER_NAME = "Your_Printer_Name_Here"
 
+File Setup (IMPORTANT)
+
+When you first run the program, it will automatically create:
+
+names.json → student names per period
+logs.json → pass history
+other_reasons.json → custom reasons
+analytics.json → usage statistics
+
+Make sure the program has permission to write files in its folder.
+
+How to Run the Program
+1. Download or clone this repository
+2. Make sure the file is named something like: bathroom_pass.py
+3. Open a terminal in the folder
+4. Run: python bathroom_pass.py
+
+How to Use
+1. Select a period
+2. Select or add a student
+3. Choose a reason
+4. The pass will:
+  -Print automatically
+  -Be logged in the system
+5. When the student returns:
+  -Click "Done" next to their name
+
+Analytics Access:
+Click the hidden "Franco" text at the bottom left
+Enter password: Ilovethisclass123
+
+You can easily customize the room number, background color, fonts and such on your own.
+Enjoy!
