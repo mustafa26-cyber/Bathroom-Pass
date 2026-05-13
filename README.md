@@ -11,6 +11,8 @@ Bathroom Pass Printer (High School)
 A Python-based bathroom pass system with a full-screen graphical interface designed for classroom use.
 It allows teachers and students to quickly generate, track, and analyze bathroom passes.
 
+We did use AI for our proejct as a tool, we only used chatgpt whenever we were stuck on a certain part of our project and couldn't figure out a way around it. We worked on the hardware parts and troubleshooting the code and testing it over and over again to make sure to work as well as go in to do any fixes that AI could've broke
+
 What this program does
 Select a class period
 Choose or add a student name
